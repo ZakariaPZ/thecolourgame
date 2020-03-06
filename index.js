@@ -8,6 +8,8 @@ var messageDisplay = document.querySelector("#message");
 var resetButton = document.querySelector("#reset");
 var modeButtons = document.querySelectorAll(".mode");
 var resetHard = true;
+var resetUltra = false;
+
 
 init();
 
@@ -16,15 +18,22 @@ function init() {
 		modeButtons[i].addEventListener("click", function() {
 			modeButtons[0].classList.remove("selected");
 			modeButtons[1].classList.remove("selected"); //remove from both, then add using "this"
+			modeButtons[2].classList.remove('selected');	
 			this.classList.add("selected");
 
 			if (this.textContent === "Easy") {
 				numOfSquares = 3;
 				resetHard = false;
+				resetUltra = false;
 
-			} else {
+			} else if (this.textContent === "Hard") {
 				numOfSquares = 9;
 				resetHard = true;
+				resetUltra = false;
+			} else {
+				numOfSquares = 12;
+				resetHard = false;
+				resetUltra = true;
 			}
 			reset(); //don't think this is needed 
 		})
@@ -33,22 +42,21 @@ function init() {
 	for (var i = 0; i < squares.length; i++) {
 	//Add colors to squares 
 	//Add click (event) listeners to squares 
-	squares[i].addEventListener("click", function() {
-		var clickedColor = this.style.backgroundColor;
+		squares[i].addEventListener("click", function() {
+			var clickedColor = this.style.backgroundColor;
 
-		if (clickedColor === pickedColor) {
-			messageDisplay.textContent = "Correct!";
-			changeColors(pickedColor);
-			h1.style.backgroundColor = pickedColor;
-			resetButton.textContent = "Play Again?"
-		} else {
-			this.style.backgroundColor = "#232323";	
-			messageDisplay.textContent = "Try again...";
-		}
-	});
-	reset();
-}
-	 
+			if (clickedColor === pickedColor) {
+				messageDisplay.textContent = "Correct!";
+				changeColors(pickedColor);
+				h1.style.backgroundColor = pickedColor;
+				resetButton.textContent = "Play Again?"
+			} else {
+				this.style.backgroundColor = "#232323";	
+				messageDisplay.textContent = wrongAns();
+			}
+		});
+		reset();
+	}
 }
 
 
@@ -66,9 +74,6 @@ function reset() {
 			squares[i].style.display = "none";
 		}
 	}	
-	
-
-
 	h1.style.backgroundColor = "steelblue";
 	messageDisplay.textContent = "";
 }
@@ -109,11 +114,24 @@ function randomColor() {
 	var b = Math.floor((Math.random()*256));
 
 	if (resetHard) { //loop until numbers are close together (at least two)
-		while(Math.abs(r-g) > 30 || Math.abs(r-b) > 30 || Math.abs(g-b) > 30) {
+		while(Math.abs(r-g) > 30 && Math.abs(r-b) > 30 && Math.abs(g-b) > 30) {
 			r = Math.floor((Math.random()*256));
 			g = Math.floor((Math.random()*256));
 			b = Math.floor((Math.random()*256));
 		}
-	}	
+	} else if (resetUltra) {
+		while(Math.abs(r-g) > 30 || Math.abs(r-b) > 30 || Math.abs(g-b) > 30) {
+			r = Math.floor((Math.random()*256));
+			g = Math.floor((Math.random()*256));
+			b = Math.floor((Math.random()*256));		
+		}	
+	}
+
 	return "rgb(" + r + ", " + g + ", " + b + ")"
+}
+
+function wrongAns() {
+	var message = ["Failure...", "Wrong!", "Need a brain?"];
+	var randMessage = Math.floor(Math.random()*3);
+	return message[randMessage];
 }
